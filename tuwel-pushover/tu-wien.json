@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "name": "TU Wien",
+  "description": "No description provided",
+  "source_url": false,
+  "guid": "6f5421ecf26f9877f35f044d37222195",
+  "tag_fg_color": "#ffffff",
+  "tag_bg_color": "#006699",
+  "icon": "book",
+  "exported_at": "2017-11-15T17:23:07Z",
+  "agents": [
+    {
+      "type": "Agents::PushoverAgent",
+      "name": "pushover",
+      "disabled": false,
+      "guid": "05cdda5452f6efe1e0c8ecda6816b0a0",
+      "options": {
+        "token": "{% credential pushover-token %}",
+        "user": "{% credential pushover-user %}",
+        "message": "{{ message }}",
+        "device": "{{ device }}",
+        "title": "{{ title }}",
+        "url": "{{ url }}",
+        "url_title": "{{ url_title }}",
+        "priority": "{{ priority }}",
+        "timestamp": "{{ timestamp }}",
+        "sound": "{{ sound }}",
+        "retry": "{{ retry }}",
+        "expire": "{{ expire }}",
+        "expected_receive_period_in_days": "1"
+      },
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "ZID TUWEL Login",
+      "disabled": false,
+      "guid": "0781d28e289e47ac3156cb59b1d143fb",
+      "options": {
+        "post_url": "https://iu.zid.tuwien.ac.at/AuthServ.portal",
+        "expected_receive_period_in_days": "1",
+        "method": "post",
+        "payload": {
+          "name": "{% credential tuwien-user %}",
+          "pw": "{% credential tuwien-pwd %}",
+          "totp": "",
+          "app": "36"
+        },
+        "emit_events": "true",
+        "no_merge": "false",
+        "output_mode": "clean",
+        "user_agent": "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)",
+        "content_type": "form",
+        "headers": {
+        },
+        "disable_redirect_follow": "true"
+      },
+      "schedule": "every_30m",
+      "keep_events_for": 0,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::WebsiteAgent",
+      "name": "TUWEL-Grade-AIC",
+      "disabled": false,
+      "guid": "68088b2340154ebfd1d982f97be01f20",
+      "options": {
+        "expected_update_period_in_days": "2",
+        "url": "https://tuwel.tuwien.ac.at/mod/assign/index.php?id=11710",
+        "type": "html",
+        "mode": "on_change",
+        "extract": {
+          "grade": {
+            "xpath": "//*[@id=\"region-main\"]/div/div/table/tbody",
+            "value": "."
+          },
+          "url": {
+            "xpath": "//*[@id=\"region-main\"]/div/div/table/tbody",
+            "value": "\"https://tuwel.tuwien.ac.at/mod/assign/index.php?id=11710\""
+          },
+          "course": {
+            "xpath": "//*[@id=\"region-main\"]/div/div/table/tbody",
+            "value": "\"AIC\""
+          }
+        },
+        "headers": {
+          "Cookie": "{{ headers['Set-Cookie'] }}"
+        }
+      },
+      "schedule": "never",
+      "keep_events_for": 0,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "ZID TUWEL Login Redirect",
+      "disabled": false,
+      "guid": "9f748acfc3b3025d791af9b80ad40ac6",
+      "options": {
+        "post_url": "https://iu.zid.tuwien.ac.at/{{  headers['Location']  }}",
+        "expected_receive_period_in_days": "1",
+        "content_type": "form",
+        "method": "get",
+        "headers": {
+          "Cookie": "{{ headers['Set-Cookie'] }}"
+        },
+        "emit_events": "true",
+        "no_merge": "false",
+        "output_mode": "clean",
+        "disable_redirect_follow": "true"
+      },
+      "schedule": "never",
+      "keep_events_for": 0,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::PostAgent",
+      "name": "ZID TUWEL Login Redirect 2",
+      "disabled": false,
+      "guid": "a9221d27985ed1f287209a7cebd77463",
+      "options": {
+        "post_url": "{{headers['Location']}}",
+        "expected_receive_period_in_days": "1",
+        "method": "get",
+        "emit_events": "true",
+        "no_merge": "false",
+        "output_mode": "clean",
+        "disable_redirect_follow": "true"
+      },
+      "schedule": "never",
+      "keep_events_for": 0,
+      "propagate_immediately": true
+    },
+    {
+      "type": "Agents::EventFormattingAgent",
+      "name": "TUWEL-Grade-Formatting",
+      "disabled": false,
+      "guid": "ab29f821873d44e5f8301935dc524618",
+      "options": {
+        "instructions": {
+          "message": "Grades for {{ course }} have been modified!",
+          "title": "{{ course }} grades",
+          "url": "{{ url }}"
+        },
+        "matchers": [
+
+        ],
+        "mode": "clean"
+      },
+      "keep_events_for": 0,
+      "propagate_immediately": true
+    }
+  ],
+  "links": [
+    {
+      "source": 1,
+      "receiver": 3
+    },
+    {
+      "source": 2,
+      "receiver": 5
+    },
+    {
+      "source": 3,
+      "receiver": 4
+    },
+    {
+      "source": 4,
+      "receiver": 2
+    },
+    {
+      "source": 5,
+      "receiver": 0
+    }
+  ],
+  "control_links": [
+
+  ]
+}
